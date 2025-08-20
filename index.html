@@ -414,19 +414,18 @@
 
     <script>
         // Konfigurasi Firebase - GANTI DENGAN KONFIGURASI ANDA SENDIRI
-        const firebaseConfig = { 
-           apiKey : "AIzaSyD4oN4BkTuqZPAt7BBgV4mXTM5f1OX2lVI" , 
-           authDomain : "undian-pusat-koin.firebaseapp.com" , 
-           projectId : "undian-pusat-koin" , 
-           storageBucket : "undian-pusat-koin.firebasestorage.app" , 
-           messageSenderId : "64691767160" , 
-           appId : "1:64691767160:web:4397e4310c920cc73d6a8d" , 
-           ID pengukuran : "G-10ZJPT9J97"
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4oN4BkTuqZPAt7BBgV4mXTM5f1OX2lVI",
+            authDomain: "undian-pusat-koin.firebaseapp.com",
+            projectId: "undian-pusat-koin",
+            storageBucket: "undian-pusat-koin.firebasestorage.app",
+            messagingSenderId: "64691767160",
+            appId: "1:64691767160:web:4397e4310c920cc73d6a8d"
         };
         
         // Inisialisasi Firebase
-        const aplikasi = inisialisasiAplikasi ( firebaseConfig );
-        const analytics = getAnalytics ( aplikasi );
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         
         // Referensi koleksi Firestore
         const participantsRef = db.collection("participants");
