@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undian Grup WhatsApp</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+        }
+        
+        header {
+            background: linear-gradient(to right, #075E54, #128C7E);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .progress-container {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: #ece5dd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #075E54;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #075E54;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        .menu-btn {
+            flex: 1;
+            padding: 12px;
+            background: #075E54;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+        
+        .menu-btn.active {
+            background: #25D366;
+        }
+        
+        .rules {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .rules ol {
+            padding-left: 20px;
+        }
+        
+        .rules li {
+            margin-bottom: 10px;
+        }
+        
+        .ticket-count {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #075E54;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-radius: 10px;
+        }
+        
+        .winner-list {
+            list-style-type: none;
+        }
+        
+        .winner-list li {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .winner-list li:last-child {
+            border-bottom: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #25D366;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+    
+    <!-- Firebase App (core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Firebase Authentication (optional) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🎉</div>
+            <h1>UNDIAN GRUP WHATSAPP</h1>
+            <p>Menuju 200 Anggota!</p>
+            
+            <div class="progress-container">
+                <div class="progress-text">
+                    <span id="progressText">0/200 Anggota</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="menu">
+                <button class="menu-btn active" onclick="showSection('register')">Daftar</button>
+                <button class="menu-btn" onclick="showSection('invite')">Undang</button>
+                <button class="menu-btn" onclick="showSection('winners')">Pemenang</button>
+            </div>
+            
+            <!-- Section Daftar -->
+            <div id="register" class="section active">
+                <div class="card">
+                    <h2>Daftar Sekarang!</h2>
+                    <p>Dapatkan 1 tiket undian gratis dengan mendaftar sebagai anggota grup WhatsApp kami.</p>
+                </div>
+                
+                <div class="rules">
+                    <h2>Syarat & Ketentuan:</h2>
+                    <ol>
+                        <li>Setiap anggota yang terdaftar mendapat 1 tiket undian</li>
+                        <li>Dapatkan 1 tiket tambahan untuk setiap anggota baru yang berhasil Anda undang</li>
+                        <li>Undian akan dilakukan ketika grup mencapai 200 anggota</li>
+                        <li>Pastikan nomor WhatsApp Anda aktif dan valid</li>
+                    </ol>
+                </div>
+                
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="name">Nama Lengkap:</label>
+                        <input type="text" id="name" required placeholder="Masukkan nama lengkap Anda">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Nomor WhatsApp:</label>
+                        <input type="text" id="phone" required placeholder="Contoh: 081234567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="referrer">Kode Referral (jika ada):</label>
+                        <input type="text" id="referrer" placeholder="Masukkan kode referral">
+                    </div>
+                    <button type="submit" id="registerBtn">Daftar Sekarang</button>
+                </form>
+                
+                <div id="registerMessage" class="message"></div>
+            </div>
+            
+            <!-- Section Undang Teman -->
+            <div id="invite" class="section">
+                <div class="card">
+                    <h2>Undang Teman</h2>
+                    <p>Dapatkan 1 tiket tambahan untuk setiap teman yang berhasil Anda undang ke grup WhatsApp kami.</p>
+                </div>
+                
+                <div class="ticket-count">
+                    Tiket Anda: <span id="userTickets">0</span>
+                </div>
+                
+                <form id="inviteForm">
+                    <div class="form-group">
+                        <label for="yourPhone">Nomor WhatsApp Anda:</label>
+                        <input type="text" id="yourPhone" required placeholder="Nomor WhatsApp Anda">
+                    </div>
+                    <div class="form-group">
+                        <label for="invitedName">Nama yang Diundang:</label>
+                        <input type="text" id="invitedName" required placeholder="Nama lengkap yang diundang">
+                    </div>
+                    <div class="form-group">
+                        <label for="invitedPhone">Nomor WhatsApp yang Diundang:</label>
+                        <input type="text" id="invitedPhone" required placeholder="Nomor WhatsApp yang berhasil diundang">
+                    </div>
+                    <button type="submit" id="inviteBtn">Laporkan Undangan</button>
+                </form>
+                
+                <div id="inviteMessage" class="message"></div>
+            </div>
+            
+            <!-- Section Pemenang -->
+            <div id="winners" class="section">
+                <div class="card">
+                    <h2>Daftar Pemenang</h2>
+                    <p>Lihat siapa saja yang telah memenangkan undian kami.</p>
+                </div>
+                
+                <div class="ticket-count">
+                    Total Anggota Terdaftar: <span id="totalMembers">0</span>
+                </div>
+                
+                <div class="card">
+                    <h2>Peringkat Tiket Terbanyak:</h2>
+                    <div id="leaderboardLoading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Memuat data...</p>
+                    </div>
+                    <ul class="winner-list" id="leaderboard">
+                        <li>Data masih dikumpulkan...</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h2>Pemenang Undian:</h2>
+                    <div id="winnersLoading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Memuat data...</p>
+                    </div>
+                    <ul class="winner-list" id="winnerList">
+                        <li>Belum ada pemenang. Jadilah yang pertama!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Undian Grup WhatsApp. Hak Cipta Dilindungi.</p>
+        <p>Website ini dikembangkan untuk membantu grup WhatsApp mencapai 200 anggota</p>
+    </footer>
+
+    <script>
+        // Konfigurasi Firebase - GANTI DENGAN KONFIGURASI ANDA SENDIRI
+        const firebaseConfig = { 
+           apiKey : "AIzaSyD4oN4BkTuqZPAt7BBgV4mXTM5f1OX2lVI" , 
+           authDomain : "undian-pusat-koin.firebaseapp.com" , 
+           projectId : "undian-pusat-koin" , 
+           storageBucket : "undian-pusat-koin.firebasestorage.app" , 
+           messageSenderId : "64691767160" , 
+           appId : "1:64691767160:web:4397e4310c920cc73d6a8d" , 
+           ID pengukuran : "G-10ZJPT9J97"
+        };
+        
+        // Inisialisasi Firebase
+        const aplikasi = inisialisasiAplikasi ( firebaseConfig );
+        const analytics = getAnalytics ( aplikasi );
+        
+        // Referensi koleksi Firestore
+        const participantsRef = db.collection("participants");
+        const winnersRef = db.collection("winners");
+        const invitesRef = db.collection("invites");
+        
+        // Elemen UI
+        const totalMembersElement = document.getElementById('totalMembers');
+        const userTicketsElement = document.getElementById('userTickets');
+        const winnerListElement = document.getElementById('winnerList');
+        const leaderboardElement = document.getElementById('leaderboard');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const registerBtn = document.getElementById('registerBtn');
+        const inviteBtn = document.getElementById('inviteBtn');
+        const leaderboardLoading = document.getElementById('leaderboardLoading');
+        const winnersLoading = document.getElementById('winnersLoading');
+        
+        // Variabel global
+        let participants = [];
+        let winners = [];
+        
+        // Fungsi untuk menampilkan section
+        function showSection(sectionId) {
+            // Sembunyikan semua section
+            const sections = document.getElementsByClassName('section');
+            for (let i = 0; i < sections.length; i++) {
+                sections[i].classList.remove('active');
+            }
+            
+            // Tampilkan section yang dipilih
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update tombol menu aktif
+            const menuBtns = document.getElementsByClassName('menu-btn');
+            for (let i = 0; i < menuBtns.length; i++) {
+                menuBtns[i].classList.remove('active');
+            }
+            
+            event.target.classList.add('active');
+            
+            // Update UI jika menuju section pemenang
+            if (sectionId === 'winners') {
+                loadWinnersData();
+            }
+        }
+        
+        // Memuat data dari Firestore
+        function loadParticipants() {
+            participantsRef.orderBy("tickets", "desc").onSnapshot(snapshot => {
+                participants = [];
+                snapshot.forEach(doc => {
+                    participants.push({ id: doc.id, ...doc.data() });
+                });
+                
+                updateUI();
+            }, error => {
+                console.error("Error loading participants:", error);
+                showMessage('registerMessage', 'error', 'Gagal memuat data peserta.');
+            });
+        }
+        
+        function loadWinners() {
+            winnersRef.orderBy("winDate", "desc").onSnapshot(snapshot => {
+                winners = [];
+                snapshot.forEach(doc => {
+                    winners.push({ id: doc.id, ...doc.data() });
+                });
+                
+                updateWinnersList();
+            }, error => {
+                console.error("Error loading winners:", error);
+                showMessage('registerMessage', 'error', 'Gagal memuat data pemenang.');
+            });
+        }
+        
+        function loadWinnersData() {
+            leaderboardLoading.style.display = 'block';
+            winnersLoading.style.display = 'block';
+            leaderboardElement.style.display = 'none';
+            winnerListElement.style.display = 'none';
+            
+            participantsRef.orderBy("tickets", "desc").limit(5).get()
+            .then(snapshot => {
+                leaderboardElement.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    leaderboardElement.innerHTML = '<li>Belum ada data peserta</li>';
+                } else {
+                    let rank = 1;
+                    snapshot.forEach(doc => {
+                        const participant = doc.data();
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div>${rank}. ${participant.name}</div>
+                            <div>${participant.tickets} Tiket</div>
+                        `;
+                        leaderboardElement.appendChild(li);
+                        rank++;
+                    });
+                }
+                
+                leaderboardLoading.style.display = 'none';
+                leaderboardElement.style.display = 'block';
+            })
+            .catch(error => {
+                console.error("Error loading leaderboard:", error);
+                leaderboardElement.innerHTML = '<li>Gagal memuat peringkat</li>';
+                leaderboardLoading.style.display = 'none';
+                leaderboardElement.style.display = 'block';
+            });
+            
+            winnersRef.orderBy("winDate", "desc").get()
+            .then(snapshot => {
+                winnerListElement.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    winnerListElement.innerHTML = '<li>Belum ada pemenang. Jadilah yang pertama!</li>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const winner = doc.data();
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div>${winner.name}</div>
+                            <div>${winner.phone}</div>
+                        `;
+                        winnerListElement.appendChild(li);
+                    });
+                }
+                
+                winnersLoading.style.display = 'none';
+                winnerListElement.style.display = 'block';
+            })
+            .catch(error => {
+                console.error("Error loading winners:", error);
+                winnerListElement.innerHTML = '<li>Gagal memuat data pemenang</li>';
+                winnersLoading.style.display = 'none';
+                winnerListElement.style.display = 'block';
+            });
+        }
+        
+        // Update tampilan data
+        function updateUI() {
+            // Update total anggota
+            totalMembersElement.textContent = participants.length;
+            
+            // Update progress bar
+            const progress = (participants.length / 200) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `${participants.length}/200 Anggota`;
+            progressPercent.textContent = `${Math.round(progress)}%`;
+            
+            // Cek jika sudah mencapai 200 anggota
+            if (participants.length >= 200 && winners.length === 0) {
+                conductDraw();
+            }
+        }
+        
+        function updateWinnersList() {
+            if (winners.length > 0) {
+                winnerListElement.innerHTML = '';
+                winners.forEach(winner => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div>${winner.name}</div>
+                        <div>${winner.phone}</div>
+                    `;
+                    winnerListElement.appendChild(li);
+                });
+            }
+        }
+        
+        // Form pendaftaran
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const referrer = document.getElementById('referrer').value.trim();
+            
+            // Validasi nomor WhatsApp
+            if (!isValidPhone(phone)) {
+                showMessage('registerMessage', 'error', 'Nomor WhatsApp tidak valid. Gunakan format angka yang benar.');
+                return;
+            }
+            
+            // Cek jika nomor sudah terdaftar
+            participantsRef.where("phone", "==", phone).get()
+            .then(snapshot => {
+                if (!snapshot.empty) {
+                    showMessage('registerMessage', 'error', 'Nomor WhatsApp ini sudah terdaftar.');
+                    return;
+                }
+                
+                // Jika belum terdaftar, tambahkan peserta baru
+                registerBtn.disabled = true;
+                registerBtn.textContent = "Mendaftarkan...";
+                
+                const newParticipant = {
+                    name,
+                    phone,
+                    tickets: 1,
+                    joinDate: new Date().toISOString(),
+                    referredBy: referrer || null
+                };
+                
+                participantsRef.add(newParticipant)
+                .then(docRef => {
+                    // Jika ada referrer, beri tambahan tiket
+                    if (referrer) {
+                        participantsRef.where("phone", "==", referrer).get()
+                        .then(snapshot => {
+                            if (!snapshot.empty) {
+                                const referrerDoc = snapshot.docs[0];
+                                const currentTickets = referrerDoc.data().tickets || 0;
+                                
+                                participantsRef.doc(referrerDoc.id).update({
+                                    tickets: currentTickets + 1
+                                })
+                                .then(() => {
+                                    showMessage('registerMessage', 'success', `Pendaftaran berhasil! ${referrerDoc.data().name} telah mendapat tambahan 1 tiket.`);
+                                    resetRegistrationForm();
+                                })
+                                .catch(error => {
+                                    console.error("Error updating referrer:", error);
+                                    showMessage('registerMessage', 'success', 'Pendaftaran berhasil! Anda mendapat 1 tiket undian.');
+                                    resetRegistrationForm();
+                                });
+                            } else {
+                                showMessage('registerMessage', 'success', 'Pendaftaran berhasil! Anda mendapat 1 tiket undian.');
+                                resetRegistrationForm();
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error finding referrer:", error);
+                            showMessage('registerMessage', 'success', 'Pendaftaran berhasil! Anda mendapat 1 tiket undian.');
+                            resetRegistrationForm();
+                        });
+                    } else {
+                        showMessage('registerMessage', 'success', 'Pendaftaran berhasil! Anda mendapat 1 tiket undian.');
+                        resetRegistrationForm();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error adding participant:", error);
+                    showMessage('registerMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = "Daftar Sekarang";
+                });
+            })
+            .catch(error => {
+                console.error("Error checking phone:", error);
+                showMessage('registerMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+        
+        function resetRegistrationForm() {
+            document.getElementById('registrationForm').reset();
+            registerBtn.disabled = false;
+            registerBtn.textContent = "Daftar Sekarang";
+        }
+        
+        // Form pelaporan undangan
+        document.getElementById('inviteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const yourPhone = document.getElementById('yourPhone').value.trim();
+            const invitedName = document.getElementById('invitedName').value.trim();
+            const invitedPhone = document.getElementById('invitedPhone').value.trim();
+            
+            // Validasi nomor WhatsApp
+            if (!isValidPhone(yourPhone) || !isValidPhone(invitedPhone)) {
+                showMessage('inviteMessage', 'error', 'Nomor WhatsApp tidak valid. Gunakan format angka yang benar.');
+                return;
+            }
+            
+            // Cari peserta
+            participantsRef.where("phone", "==", yourPhone).get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    showMessage('inviteMessage', 'error', 'Nomor WhatsApp Anda belum terdaftar. Silakan daftar terlebih dahulu.');
+                    return;
+                }
+                
+                const participantDoc = snapshot.docs[0];
+                const participantId = participantDoc.id;
+                const currentTickets = participantDoc.data().tickets || 0;
+                
+                // Cek apakah undangan sudah pernah dilaporkan
+                invitesRef.where("invitedPhone", "==", invitedPhone).get()
+                .then(inviteSnapshot => {
+                    if (!inviteSnapshot.empty) {
+                        showMessage('inviteMessage', 'error', 'Nomor yang diundang sudah pernah dilaporkan.');
+                        return;
+                    }
+                    
+                    // Simpan data undangan
+                    inviteBtn.disabled = true;
+                    inviteBtn.textContent = "Melaporkan...";
+                    
+                    const inviteData = {
+                        inviterPhone: yourPhone,
+                        invitedName,
+                        invitedPhone,
+                        reportDate: new Date().toISOString()
+                    };
+                    
+                    invitesRef.add(inviteData)
+                    .then(() => {
+                        // Update tiket peserta
+                        participantsRef.doc(participantId).update({
+                            tickets: currentTickets + 1
+                        })
+                        .then(() => {
+                            showMessage('inviteMessage', 'success', 'Laporan undangan berhasil! Anda mendapat 1 tiket tambahan.');
+                            document.getElementById('inviteForm').reset();
+                            inviteBtn.disabled = false;
+                            inviteBtn.textContent = "Laporkan Undangan";
+                        })
+                        .catch(error => {
+                            console.error("Error updating tickets:", error);
+                            showMessage('inviteMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+                            inviteBtn.disabled = false;
+                            inviteBtn.textContent = "Laporkan Undangan";
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error saving invite:", error);
+                        showMessage('inviteMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+                        inviteBtn.disabled = false;
+                        inviteBtn.textContent = "Laporkan Undangan";
+                    });
+                })
+                .catch(error => {
+                    console.error("Error checking invite:", error);
+                    showMessage('inviteMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+                });
+            })
+            .catch(error => {
+                console.error("Error finding participant:", error);
+                showMessage('inviteMessage', 'error', 'Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+        
+        // Fungsi untuk melakukan undian
+        function conductDraw() {
+            // Hanya lakukan undian jika belum ada pemenang
+            if (winners.length === 0) {
+                // Hitung total tiket
+                let totalTickets = 0;
+                participants.forEach(participant => {
+                    totalTickets += participant.tickets || 0;
+                });
+                
+                if (totalTickets === 0) return;
+                
+                // Pilih pemenang acak berdasarkan jumlah tiket
+                let randomTicket = Math.floor(Math.random() * totalTickets) + 1;
+                
+                let winner = null;
+                for (const participant of participants) {
+                    randomTicket -= participant.tickets || 0;
+                    if (randomTicket <= 0) {
+                        winner = participant;
+                        break;
+                    }
+                }
+                
+                if (winner) {
+                    const winnerData = {
+                        name: winner.name,
+                        phone: winner.phone,
+                        tickets: winner.tickets,
+                        winDate: new Date().toISOString()
+                    };
+                    
+                    winnersRef.add(winnerData)
+                    .then(() => {
+                        // Tampilkan alert untuk semua pengguna
+                        alert(`Selamat! ${winner.name} (${winner.phone}) memenangkan undian!`);
+                    })
+                    .catch(error => {
+                        console.error("Error saving winner:", error);
+                    });
+                }
+            }
+        }
+        
+        // Fungsi bantuan untuk validasi nomor telepon
+        function isValidPhone(phone) {
+            const phoneRegex = /^[0-9]{10,15}$/;
+            return phoneRegex.test(phone);
+        }
+        
+        // Fungsi untuk menampilkan pesan
+        function showMessage(elementId, type, message) {
+            const messageElement = document.getElementById(elementId);
+            messageElement.textContent = message;
+            messageElement.className = `message ${type}`;
+            messageElement.style.display = 'block';
+            
+            // Sembunyikan pesan setelah 5 detik
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Inisialisasi UI saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data dari Firestore
+            loadParticipants();
+            loadWinners();
+        });
+    </script>
+</body>
+</html>
