@@ -4,7 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Undian Grup WhatsApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase App (wajib) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <style>
+        :root {
+            --primary: #25D366;
+            --secondary: #128C7E;
+            --accent: #34B7F1;
+            --light: #ece5dd;
+            --dark: #075E54;
+            --gray: #dadbd3;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,8 +29,9 @@
         }
         
         body {
-            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
             color: #333;
+            line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -24,29 +41,29 @@
         
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
+            margin: 20px auto;
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         header {
-            background: linear-gradient(to right, #075E54, #128C7E);
+            background: linear-gradient(to right, var(--dark), var(--secondary));
             color: white;
             padding: 25px 20px;
             text-align: center;
         }
         
-        header h1 {
-            font-size: 24px;
+        .logo {
+            font-size: 28px;
             margin-bottom: 10px;
         }
         
-        .logo {
-            font-size: 40px;
-            margin-bottom: 15px;
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
         }
         
         .progress-container {
@@ -74,33 +91,55 @@
             height: 100%;
             background-color: white;
             border-radius: 10px;
-            width: 0%;
+            width: 45%;
             transition: width 0.5s ease;
         }
         
-        .content {
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
             padding: 20px;
         }
         
-        .section {
+        .tab-pane {
             display: none;
         }
         
-        .section.active {
+        .tab-pane.active {
             display: block;
+            animation: fadeIn 0.5s;
         }
         
         .card {
-            background-color: #ece5dd;
+            background-color: var(--light);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
         }
         
         h2 {
-            color: #075E54;
+            color: var(--dark);
             margin-bottom: 15px;
-            text-align: center;
         }
         
         .form-group {
@@ -111,7 +150,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #075E54;
+            color: var(--dark);
         }
         
         input {
@@ -123,7 +162,7 @@
         }
         
         button {
-            background: linear-gradient(to right, #25D366, #128C7E);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             border: none;
             padding: 15px;
@@ -132,38 +171,16 @@
             font-size: 16px;
             font-weight: bold;
             width: 100%;
-            margin-top: 10px;
+            transition: transform 0.3s;
         }
         
         button:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
         }
         
         button:disabled {
-            background: #ccc;
+            background: #cccccc;
             cursor: not-allowed;
-        }
-        
-        .menu {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        
-        .menu-btn {
-            flex: 1;
-            padding: 12px;
-            background: #075E54;
-            color: white;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            margin: 0 5px;
-            border-radius: 5px;
-        }
-        
-        .menu-btn.active {
-            background: #25D366;
         }
         
         .rules {
@@ -185,7 +202,7 @@
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-            color: #075E54;
+            color: var(--dark);
             margin: 20px 0;
             padding: 15px;
             background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
@@ -206,15 +223,6 @@
         
         .winner-list li:last-child {
             border-bottom: none;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            color: white;
-            font-size: 14px;
-            width: 100%;
-            max-width: 600px;
         }
         
         .message {
@@ -239,14 +247,15 @@
         .loading {
             text-align: center;
             padding: 20px;
+            display: none;
         }
         
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #25D366;
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
@@ -254,6 +263,20 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         @media (max-width: 600px) {
@@ -265,27 +288,28 @@
                 padding: 20px 15px;
             }
             
-            header h1 {
+            h1 {
                 font-size: 20px;
+            }
+            
+            .tab-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .tab-content {
+                padding: 15px;
             }
         }
     </style>
-    
-    <!-- Firebase App (core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-    <!-- Firebase Authentication (optional) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="logo">🎉</div>
-            <h1>UNDIAN GRUP WHATSAPP</h1>
-            <p>Menuju 200 Anggota!</p>
+            <div class="logo">
+                <i class="fas fa-ticket-alt"></i> UNDIAN GRUP WHATSAPP <i class="fas fa-gift"></i>
+            </div>
+            <h1>Menuju 200 Anggota!</h1>
             
             <div class="progress-container">
                 <div class="progress-text">
@@ -298,22 +322,22 @@
             </div>
         </header>
         
-        <div class="content">
-            <div class="menu">
-                <button class="menu-btn active" onclick="showSection('register')">Daftar</button>
-                <button class="menu-btn" onclick="showSection('invite')">Undang</button>
-                <button class="menu-btn" onclick="showSection('winners')">Pemenang</button>
-            </div>
-            
-            <!-- Section Daftar -->
-            <div id="register" class="section active">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('register')">Daftar</button>
+            <button class="tab-btn" onclick="openTab('invite')">Undang Teman</button>
+            <button class="tab-btn" onclick="openTab('winners')">Pemenang</button>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Tab Daftar -->
+            <div id="register" class="tab-pane active">
                 <div class="card">
-                    <h2>Daftar Sekarang!</h2>
+                    <h2><i class="fas fa-user-plus"></i> Daftar Sekarang!</h2>
                     <p>Dapatkan 1 tiket undian gratis dengan mendaftar sebagai anggota grup WhatsApp kami.</p>
                 </div>
                 
                 <div class="rules">
-                    <h2>Syarat & Ketentuan:</h2>
+                    <h2><i class="fas fa-info-circle"></i> Syarat & Ketentuan:</h2>
                     <ol>
                         <li>Setiap anggota yang terdaftar mendapat 1 tiket undian</li>
                         <li>Dapatkan 1 tiket tambahan untuk setiap anggota baru yang berhasil Anda undang</li>
@@ -335,16 +359,16 @@
                         <label for="referrer">Kode Referral (jika ada):</label>
                         <input type="text" id="referrer" placeholder="Masukkan kode referral">
                     </div>
-                    <button type="submit" id="registerBtn">Daftar Sekarang</button>
+                    <button type="submit" id="registerBtn"><i class="fas fa-paper-plane"></i> Daftar Sekarang</button>
                 </form>
                 
                 <div id="registerMessage" class="message"></div>
             </div>
             
-            <!-- Section Undang Teman -->
-            <div id="invite" class="section">
+            <!-- Tab Undang Teman -->
+            <div id="invite" class="tab-pane">
                 <div class="card">
-                    <h2>Undang Teman</h2>
+                    <h2><i class="fas fa-users"></i> Undang Teman</h2>
                     <p>Dapatkan 1 tiket tambahan untuk setiap teman yang berhasil Anda undang ke grup WhatsApp kami.</p>
                 </div>
                 
@@ -365,16 +389,16 @@
                         <label for="invitedPhone">Nomor WhatsApp yang Diundang:</label>
                         <input type="text" id="invitedPhone" required placeholder="Nomor WhatsApp yang berhasil diundang">
                     </div>
-                    <button type="submit" id="inviteBtn">Laporkan Undangan</button>
+                    <button type="submit" id="inviteBtn"><i class="fas fa-check-circle"></i> Laporkan Undangan</button>
                 </form>
                 
                 <div id="inviteMessage" class="message"></div>
             </div>
             
-            <!-- Section Pemenang -->
-            <div id="winners" class="section">
+            <!-- Tab Pemenang -->
+            <div id="winners" class="tab-pane">
                 <div class="card">
-                    <h2>Daftar Pemenang</h2>
+                    <h2><i class="fas fa-trophy"></i> Daftar Pemenang</h2>
                     <p>Lihat siapa saja yang telah memenangkan undian kami.</p>
                 </div>
                 
@@ -383,21 +407,21 @@
                 </div>
                 
                 <div class="card">
-                    <h2>Peringkat Tiket Terbanyak:</h2>
-                    <div id="leaderboardLoading" class="loading">
+                    <h2><i class="fas fa-crown"></i> Peringkat Tiket Terbanyak:</h2>
+                    <div class="loading" id="leaderboardLoading">
                         <div class="spinner"></div>
-                        <p>Memuat data...</p>
+                        <p>Memuat data peringkat...</p>
                     </div>
                     <ul class="winner-list" id="leaderboard">
-                        <li>Data masih dikumpulkan...</li>
+                        <li>Data sedang dimuat...</li>
                     </ul>
                 </div>
                 
                 <div class="card">
-                    <h2>Pemenang Undian:</h2>
-                    <div id="winnersLoading" class="loading">
+                    <h2><i class="fas fa-star"></i> Pemenang Undian:</h2>
+                    <div class="loading" id="winnersLoading">
                         <div class="spinner"></div>
-                        <p>Memuat data...</p>
+                        <p>Memuat data pemenang...</p>
                     </div>
                     <ul class="winner-list" id="winnerList">
                         <li>Belum ada pemenang. Jadilah yang pertama!</li>
@@ -413,14 +437,15 @@
     </footer>
 
     <script>
-        // Konfigurasi Firebase - GANTI DENGAN KONFIGURASI ANDA SENDIRI
+        // Konfigurasi Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyD4oN4BkTuqZPAt7BBgV4mXTM5f1OX2lVI",
             authDomain: "undian-pusat-koin.firebaseapp.com",
             projectId: "undian-pusat-koin",
             storageBucket: "undian-pusat-koin.firebasestorage.app",
             messagingSenderId: "64691767160",
-            appId: "1:64691767160:web:4397e4310c920cc73d6a8d"
+            appId: "1:64691767160:web:4397e4310c920cc73d6a8d",
+            measurementId: "G-10ZJPT9J97"
         };
         
         // Inisialisasi Firebase
@@ -449,32 +474,33 @@
         let participants = [];
         let winners = [];
         
-        // Fungsi untuk menampilkan section
-        function showSection(sectionId) {
-            // Sembunyikan semua section
-            const sections = document.getElementsByClassName('section');
-            for (let i = 0; i < sections.length; i++) {
-                sections[i].classList.remove('active');
+        // Fungsi untuk membuka tab
+        function openTab(tabName) {
+            // Sembunyikan semua tab
+            const tabPanes = document.getElementsByClassName('tab-pane');
+            for (let i = 0; i < tabPanes.length; i++) {
+                tabPanes[i].classList.remove('active');
             }
             
-            // Tampilkan section yang dipilih
-            document.getElementById(sectionId).classList.add('active');
+            // Tampilkan tab yang dipilih
+            document.getElementById(tabName).classList.add('active');
             
-            // Update tombol menu aktif
-            const menuBtns = document.getElementsByClassName('menu-btn');
-            for (let i = 0; i < menuBtns.length; i++) {
-                menuBtns[i].classList.remove('active');
+            // Update tombol tab aktif
+            const tabBtns = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove('active');
             }
             
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
             
-            // Update UI jika menuju section pemenang
-            if (sectionId === 'winners') {
-                loadWinnersData();
+            // Jika membuka tab pemenang, muat data terbaru
+            if (tabName === 'winners') {
+                loadLeaderboard();
+                loadWinners();
             }
         }
         
-        // Memuat data dari Firestore
+        // Memuat data peserta dari Firestore
         function loadParticipants() {
             participantsRef.orderBy("tickets", "desc").onSnapshot(snapshot => {
                 participants = [];
@@ -489,25 +515,46 @@
             });
         }
         
+        // Memuat data pemenang dari Firestore
         function loadWinners() {
-            winnersRef.orderBy("winDate", "desc").onSnapshot(snapshot => {
+            winnersLoading.style.display = 'block';
+            winnerListElement.style.display = 'none';
+            
+            winnersRef.orderBy("winDate", "desc").get()
+            .then(snapshot => {
                 winners = [];
-                snapshot.forEach(doc => {
-                    winners.push({ id: doc.id, ...doc.data() });
-                });
+                winnerListElement.innerHTML = '';
                 
-                updateWinnersList();
-            }, error => {
+                if (snapshot.empty) {
+                    winnerListElement.innerHTML = '<li>Belum ada pemenang. Jadilah yang pertama!</li>';
+                } else {
+                    snapshot.forEach(doc => {
+                        winners.push({ id: doc.id, ...doc.data() });
+                        const winner = doc.data();
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div>${winner.name}</div>
+                            <div>${winner.phone}</div>
+                        `;
+                        winnerListElement.appendChild(li);
+                    });
+                }
+                
+                winnersLoading.style.display = 'none';
+                winnerListElement.style.display = 'block';
+            })
+            .catch(error => {
                 console.error("Error loading winners:", error);
-                showMessage('registerMessage', 'error', 'Gagal memuat data pemenang.');
+                winnerListElement.innerHTML = '<li>Gagal memuat data pemenang.</li>';
+                winnersLoading.style.display = 'none';
+                winnerListElement.style.display = 'block';
             });
         }
         
-        function loadWinnersData() {
+        // Memuat leaderboard
+        function loadLeaderboard() {
             leaderboardLoading.style.display = 'block';
-            winnersLoading.style.display = 'block';
             leaderboardElement.style.display = 'none';
-            winnerListElement.style.display = 'none';
             
             participantsRef.orderBy("tickets", "desc").limit(5).get()
             .then(snapshot => {
@@ -538,34 +585,6 @@
                 leaderboardLoading.style.display = 'none';
                 leaderboardElement.style.display = 'block';
             });
-            
-            winnersRef.orderBy("winDate", "desc").get()
-            .then(snapshot => {
-                winnerListElement.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    winnerListElement.innerHTML = '<li>Belum ada pemenang. Jadilah yang pertama!</li>';
-                } else {
-                    snapshot.forEach(doc => {
-                        const winner = doc.data();
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <div>${winner.name}</div>
-                            <div>${winner.phone}</div>
-                        `;
-                        winnerListElement.appendChild(li);
-                    });
-                }
-                
-                winnersLoading.style.display = 'none';
-                winnerListElement.style.display = 'block';
-            })
-            .catch(error => {
-                console.error("Error loading winners:", error);
-                winnerListElement.innerHTML = '<li>Gagal memuat data pemenang</li>';
-                winnersLoading.style.display = 'none';
-                winnerListElement.style.display = 'block';
-            });
         }
         
         // Update tampilan data
@@ -582,20 +601,6 @@
             // Cek jika sudah mencapai 200 anggota
             if (participants.length >= 200 && winners.length === 0) {
                 conductDraw();
-            }
-        }
-        
-        function updateWinnersList() {
-            if (winners.length > 0) {
-                winnerListElement.innerHTML = '';
-                winners.forEach(winner => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div>${winner.name}</div>
-                        <div>${winner.phone}</div>
-                    `;
-                    winnerListElement.appendChild(li);
-                });
             }
         }
         
@@ -839,6 +844,7 @@
             // Load data dari Firestore
             loadParticipants();
             loadWinners();
+            loadLeaderboard();
         });
     </script>
 </body>
